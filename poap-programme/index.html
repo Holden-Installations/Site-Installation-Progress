@@ -1,0 +1,2354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marked-up programme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <script>
+      /* monday-sdk-js 0.5.9 (inlined so the app has no outside script dependency) */
+      !(function (e) {
+        var t = {};
+        function n(i) {
+          if (t[i]) return t[i].exports;
+          var r = (t[i] = { i: i, l: !1, exports: {} });
+          return (e[i].call(r.exports, r, r.exports, n), (r.l = !0), r.exports);
+        }
+        ((n.m = e),
+          (n.c = t),
+          (n.d = function (e, t, i) {
+            n.o(e, t) ||
+              Object.defineProperty(e, t, { enumerable: !0, get: i });
+          }),
+          (n.r = function (e) {
+            ("undefined" != typeof Symbol &&
+              Symbol.toStringTag &&
+              Object.defineProperty(e, Symbol.toStringTag, { value: "Module" }),
+              Object.defineProperty(e, "__esModule", { value: !0 }));
+          }),
+          (n.t = function (e, t) {
+            if ((1 & t && (e = n(e)), 8 & t)) return e;
+            if (4 & t && "object" == typeof e && e && e.__esModule) return e;
+            var i = Object.create(null);
+            if (
+              (n.r(i),
+              Object.defineProperty(i, "default", { enumerable: !0, value: e }),
+              2 & t && "string" != typeof e)
+            )
+              for (var r in e)
+                n.d(
+                  i,
+                  r,
+                  function (t) {
+                    return e[t];
+                  }.bind(null, r),
+                );
+            return i;
+          }),
+          (n.n = function (e) {
+            var t =
+              e && e.__esModule
+                ? function () {
+                    return e.default;
+                  }
+                : function () {
+                    return e;
+                  };
+            return (n.d(t, "a", t), t);
+          }),
+          (n.o = function (e, t) {
+            return Object.prototype.hasOwnProperty.call(e, t);
+          }),
+          (n.p = ""),
+          n((n.s = 4)));
+      })([
+        function (e, t, n) {
+          e.exports = n(6);
+        },
+        function (e, t, n) {
+          (function (t) {
+            function n() {
+              return void 0 !== t && !1;
+            }
+            const i = (e, i) =>
+                n() && "undefined" !== t.env[e] && void 0 !== t.env[e]
+                  ? t.env[e]
+                  : i,
+              r = () => i("MONDAY_COM_PROTOCOL", "https"),
+              s = () => i("MONDAY_COM_DOMAIN", "monday.com"),
+              o = () => i("MONDAY_OAUTH_SUBDOMAIN", "auth."),
+              a = () =>
+                `${r()}://${i("MONDAY_SUBDOMAIN_API", "api.")}${s()}/v2`;
+            e.exports = {
+              get MONDAY_DOMAIN() {
+                return s();
+              },
+              get MONDAY_PROTOCOL() {
+                return r();
+              },
+              get MONDAY_API_URL() {
+                return a();
+              },
+              get MONDAY_OAUTH_URL() {
+                return `${r()}://${o()}${s()}/oauth2/authorize`;
+              },
+              get MONDAY_OAUTH_TOKEN_URL() {
+                return `${r()}://${o()}${s()}/oauth2/token`;
+              },
+            };
+          }).call(this, n(7));
+        },
+        function (e, t) {
+          const n = "undefined" != typeof window && void 0 !== window.document;
+          e.exports = {
+            convertToArrayIfNeeded: (e) => (Array.isArray(e) ? e : [e]),
+            isBrowser: n,
+          };
+        },
+        function (e, t) {
+          e.exports = {
+            logWarnings: (e) => {
+              const t = e && e.extensions && e.extensions.warnings;
+              return t && Array.isArray(t)
+                ? (t.forEach((e) => {
+                    if (e && e.message)
+                      try {
+                        const t =
+                            e.locations &&
+                            e.locations
+                              .map((e) => `line ${e.line}, column ${e.column}`)
+                              .join("; "),
+                          n = e.path && e.path.join(" → ");
+                        let i = e.message;
+                        ((i = i.replace(/\.$/, "")),
+                          (i = i.charAt(0).toLowerCase() + i.slice(1)));
+                        const r = [
+                          "[monday API]",
+                          `${n}:`,
+                          i,
+                          t && `@ ${t}`,
+                          e.extensions
+                            ? ["\n\nAdditional details:", e.extensions]
+                            : void 0,
+                        ]
+                          .flat()
+                          .filter(Boolean);
+                        console.warn(...r);
+                      } catch (t) {
+                        e && console.warn("[monday API] Warning:", e);
+                      }
+                  }),
+                  e)
+                : e;
+            },
+          };
+        },
+        function (e, t, n) {
+          var i, r;
+          const { isBrowser: s } = n(2),
+            o = n(s ? 5 : 13);
+          ("undefined" != typeof self && self,
+            void 0 ===
+              (r =
+                "function" ==
+                typeof (i = function () {
+                  return ((window.mondaySdk = o), o);
+                })
+                  ? i.call(t, n, t, e)
+                  : i) || (e.exports = r));
+        },
+        function (e, t, n) {
+          const i = n(0),
+            { MONDAY_OAUTH_URL: r } = n(1),
+            { convertToArrayIfNeeded: s } = n(2),
+            { initScrollHelperIfNeeded: o } = n(10),
+            { initBackgroundTracking: a } = n(11),
+            { logWarnings: c } = n(3),
+            l = [],
+            u = "v2",
+            d = "instance";
+          class h {
+            constructor(e = {}) {
+              ((this._clientId = e.clientId),
+                (this._apiToken = e.apiToken),
+                (this._apiVersion = e.apiVersion),
+                (this.listeners = {}),
+                (this.setClientId = this.setClientId.bind(this)),
+                (this.setToken = this.setToken.bind(this)),
+                (this.setApiVersion = this.setApiVersion.bind(this)),
+                (this.api = this.api.bind(this)),
+                (this.listen = this.listen.bind(this)),
+                (this.get = this.get.bind(this)),
+                (this.set = this.set.bind(this)),
+                (this.execute = this.execute.bind(this)),
+                (this.oauth = this.oauth.bind(this)),
+                (this._receiveMessage = this._receiveMessage.bind(this)),
+                (this.storage = {
+                  setItem: this.setStorageItem.bind(this),
+                  getItem: this.getStorageItem.bind(this),
+                  deleteItem: this.deleteStorageItem.bind(this),
+                  instance: {
+                    setItem: this.setStorageInstanceItem.bind(this),
+                    getItem: this.getStorageInstanceItem.bind(this),
+                    deleteItem: this.deleteStorageInstanceItem.bind(this),
+                  },
+                }),
+                window.addEventListener("message", this._receiveMessage, !1),
+                e.withoutScrollHelper || o(),
+                a(this));
+            }
+            setClientId(e) {
+              this._clientId = e;
+            }
+            setToken(e) {
+              this._apiToken = e;
+            }
+            setApiVersion(e) {
+              this._apiVersion = e;
+            }
+            api(e, t = {}) {
+              const n = { query: e, variables: t.variables },
+                r = t.token || this._apiToken,
+                s = t.apiVersion || this._apiVersion;
+              let o;
+              return (
+                (o = r
+                  ? i.execute(n, r, { apiVersion: s })
+                  : this._localApi("api", { params: n, apiVersion: s }).then(
+                      (e) => e.data,
+                    )),
+                o.then(c)
+              );
+            }
+            listen(e, t, n) {
+              const i = s(e),
+                r = [];
+              return (
+                i.forEach((e) => {
+                  (r.push(this._addListener(e, t)),
+                    this._localApi("listen", { type: e, params: n }));
+                }),
+                () => {
+                  r.forEach((e) => e());
+                }
+              );
+            }
+            get(e, t) {
+              return this._localApi("get", { type: e, params: t });
+            }
+            set(e, t) {
+              return this._localApi("set", { type: e, params: t });
+            }
+            execute(e, t) {
+              return this._localApi("execute", { type: e, params: t });
+            }
+            track(e, t) {
+              return this.execute("track", { name: e, data: t });
+            }
+            oauth(e = {}) {
+              const t = e.clientId || this._clientId;
+              if (!t) throw new Error("clientId is required");
+              const n = `${e.mondayOauthUrl || r}?client_id=${t}`;
+              window.location = n;
+            }
+            setStorageItem(e, t, n = {}) {
+              return this._localApi("storage", {
+                method: "set",
+                key: e,
+                value: t,
+                options: n,
+                segment: u,
+              });
+            }
+            getStorageItem(e, t = {}) {
+              return this._localApi("storage", {
+                method: "get",
+                key: e,
+                options: t,
+                segment: u,
+              });
+            }
+            deleteStorageItem(e, t = {}) {
+              return this._localApi("storage", {
+                method: "delete",
+                key: e,
+                options: t,
+                segment: u,
+              });
+            }
+            setStorageInstanceItem(e, t, n = {}) {
+              return this._localApi("storage", {
+                method: "set",
+                key: e,
+                value: t,
+                options: n,
+                segment: d,
+              });
+            }
+            getStorageInstanceItem(e, t = {}) {
+              return this._localApi("storage", {
+                method: "get",
+                key: e,
+                options: t,
+                segment: d,
+              });
+            }
+            deleteStorageInstanceItem(e, t = {}) {
+              return this._localApi("storage", {
+                method: "delete",
+                key: e,
+                options: t,
+                segment: d,
+              });
+            }
+            _localApi(e, t) {
+              return new Promise((i, r) => {
+                const s = this._generateRequestId(),
+                  o = this._clientId,
+                  a = n(12).version;
+                window.parent.postMessage(
+                  { method: e, args: t, requestId: s, clientId: o, version: a },
+                  "*",
+                );
+                const c = this._addListener(s, (e) => {
+                  if ((c(), e.errorMessage)) {
+                    const t = new Error(e.errorMessage);
+                    ((t.data = e.data), r(t));
+                  } else i(e);
+                });
+              });
+            }
+            _receiveMessage(e) {
+              const { method: t, type: n, requestId: i } = e.data,
+                r = this.listeners[t] || l,
+                s = this.listeners[n] || l,
+                o = this.listeners[i] || l;
+              let a = new Set([...r, ...s, ...o]);
+              a &&
+                a.forEach((t) => {
+                  try {
+                    t(e.data);
+                  } catch (e) {
+                    console.error("Message callback error: ", e);
+                  }
+                });
+            }
+            _addListener(e, t) {
+              return (
+                (this.listeners[e] = this.listeners[e] || new Set()),
+                this.listeners[e].add(t),
+                () => {
+                  (this.listeners[e].delete(t),
+                    0 === this.listeners[e].size && delete this.listeners[e]);
+                }
+              );
+            }
+            _generateRequestId() {
+              return Math.random().toString(36).substring(2, 9);
+            }
+            _removeEventListener() {
+              window.removeEventListener("message", this._receiveMessage, !1);
+            }
+            _clearListeners() {
+              this.listeners = [];
+            }
+          }
+          e.exports = function (e = {}) {
+            return new h(e);
+          };
+        },
+        function (e, t, n) {
+          const { MONDAY_API_URL: i, MONDAY_OAUTH_TOKEN_URL: r } = n(1),
+            s = n(8);
+          e.exports = {
+            execute: async function (e, t, n = {}) {
+              if (!t && n.url !== r) throw new Error("Token is required");
+              const o = `${n.url || i}${n.path || ""}`;
+              let a = await (function (e, t, n, i = {}) {
+                return s.nodeFetch(e, {
+                  method: i.method || "POST",
+                  body: JSON.stringify(t || {}),
+                  headers: {
+                    Authorization: n,
+                    "Content-Type": "application/json",
+                    ...(i.apiVersion ? { "API-Version": i.apiVersion } : {}),
+                  },
+                });
+              })(o, e, t, n);
+              const c = a.status,
+                l = a.headers.get("content-type");
+              if (!l || !l.includes("application/json")) {
+                if (504 === c)
+                  throw new Error(
+                    "Received timeout from monday.com's GraphQL API",
+                  );
+                const e = await a.text();
+                throw new Error(e);
+              }
+              try {
+                return await a.json();
+              } catch (e) {
+                throw new Error(
+                  "Could not parse JSON from monday.com's GraphQL API response",
+                );
+              }
+            },
+            COULD_NOT_PARSE_JSON_RESPONSE_ERROR:
+              "Could not parse JSON from monday.com's GraphQL API response",
+            TOKEN_IS_REQUIRED_ERROR: "Token is required",
+            API_TIMEOUT_ERROR: "Received timeout from monday.com's GraphQL API",
+          };
+        },
+        function (e, t) {
+          var n,
+            i,
+            r = (e.exports = {});
+          function s() {
+            throw new Error("setTimeout has not been defined");
+          }
+          function o() {
+            throw new Error("clearTimeout has not been defined");
+          }
+          function a(e) {
+            if (n === setTimeout) return setTimeout(e, 0);
+            if ((n === s || !n) && setTimeout)
+              return ((n = setTimeout), setTimeout(e, 0));
+            try {
+              return n(e, 0);
+            } catch (t) {
+              try {
+                return n.call(null, e, 0);
+              } catch (t) {
+                return n.call(this, e, 0);
+              }
+            }
+          }
+          !(function () {
+            try {
+              n = "function" == typeof setTimeout ? setTimeout : s;
+            } catch (e) {
+              n = s;
+            }
+            try {
+              i = "function" == typeof clearTimeout ? clearTimeout : o;
+            } catch (e) {
+              i = o;
+            }
+          })();
+          var c,
+            l = [],
+            u = !1,
+            d = -1;
+          function h() {
+            u &&
+              c &&
+              ((u = !1),
+              c.length ? (l = c.concat(l)) : (d = -1),
+              l.length && p());
+          }
+          function p() {
+            if (!u) {
+              var e = a(h);
+              u = !0;
+              for (var t = l.length; t; ) {
+                for (c = l, l = []; ++d < t; ) c && c[d].run();
+                ((d = -1), (t = l.length));
+              }
+              ((c = null),
+                (u = !1),
+                (function (e) {
+                  if (i === clearTimeout) return clearTimeout(e);
+                  if ((i === o || !i) && clearTimeout)
+                    return ((i = clearTimeout), clearTimeout(e));
+                  try {
+                    i(e);
+                  } catch (t) {
+                    try {
+                      return i.call(null, e);
+                    } catch (t) {
+                      return i.call(this, e);
+                    }
+                  }
+                })(e));
+            }
+          }
+          function f(e, t) {
+            ((this.fun = e), (this.array = t));
+          }
+          function m() {}
+          ((r.nextTick = function (e) {
+            var t = new Array(arguments.length - 1);
+            if (arguments.length > 1)
+              for (var n = 1; n < arguments.length; n++)
+                t[n - 1] = arguments[n];
+            (l.push(new f(e, t)), 1 !== l.length || u || a(p));
+          }),
+            (f.prototype.run = function () {
+              this.fun.apply(null, this.array);
+            }),
+            (r.title = "browser"),
+            (r.browser = !0),
+            (r.env = {}),
+            (r.argv = []),
+            (r.version = ""),
+            (r.versions = {}),
+            (r.on = m),
+            (r.addListener = m),
+            (r.once = m),
+            (r.off = m),
+            (r.removeListener = m),
+            (r.removeAllListeners = m),
+            (r.emit = m),
+            (r.prependListener = m),
+            (r.prependOnceListener = m),
+            (r.listeners = function (e) {
+              return [];
+            }),
+            (r.binding = function (e) {
+              throw new Error("process.binding is not supported");
+            }),
+            (r.cwd = function () {
+              return "/";
+            }),
+            (r.chdir = function (e) {
+              throw new Error("process.chdir is not supported");
+            }),
+            (r.umask = function () {
+              return 0;
+            }));
+        },
+        function (e, t, n) {
+          const i = n(9);
+          e.exports = {
+            nodeFetch: function (e, t = {}) {
+              return i(e, t);
+            },
+          };
+        },
+        function (e, t, n) {
+          "use strict";
+          var i = (function () {
+            if ("undefined" != typeof self) return self;
+            if ("undefined" != typeof window) return window;
+            if (void 0 !== i) return i;
+            throw new Error("unable to locate global object");
+          })();
+          ((e.exports = t = i.fetch),
+            (t.default = i.fetch.bind(i)),
+            (t.Headers = i.Headers),
+            (t.Request = i.Request),
+            (t.Response = i.Response));
+        },
+        function (e, t) {
+          let n = !1;
+          e.exports = {
+            initScrollHelperIfNeeded: function () {
+              if (n) return;
+              n = !0;
+              const e = document.createElement("style");
+              (e.appendChild(
+                document.createTextNode(
+                  'body::before { content: ""; position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; z-index: 2147483647; /* mondaySdk css - can be disabled with: mondaySdk({withoutScrollHelper: true }) */ }',
+                ),
+              ),
+                (
+                  document.head || document.getElementsByTagName("head")[0]
+                ).appendChild(e));
+            },
+          };
+        },
+        function (e, t) {
+          let n = !1;
+          e.exports = {
+            initBackgroundTracking: (e) => {
+              if (n) return;
+              n = !0;
+              const t = () => {
+                e.track("ping");
+              };
+              (t(), setInterval(t, 3e5));
+            },
+          };
+        },
+        function (e) {
+          e.exports = JSON.parse(
+            '{"name":"monday-sdk-js","version":"0.4.12","private":false,"repository":"https://github.com/mondaycom/monday-sdk-js","main":"src/index.js","types":"types/index.d.ts","author":"talharamati <tal@monday.com>","license":"MIT","files":["LICENSE","README.md","dist/","src/","types/","server-sdk.js"],"dependencies":{"node-fetch":"^2.6.0"},"devDependencies":{"@babel/cli":"^7.6.0","@babel/core":"^7.6.0","@babel/node":"^7.6.1","@babel/preset-env":"^7.6.0","@babel/preset-react":"^7.0.0","@babel/register":"^7.6.0","@types/source-map":"^0.5.2","babel-loader":"^8.0.6","chai":"^4.2.0","eslint":"^6.8.0","jsdom":"^16.2.0","mocha":"^7.1.0","prettier":"^1.19.1","sinon":"^9.0.0","sinon-chai":"^3.5.0","typescript":"^4.9.5","webpack":"^4.38.0","webpack-cli":"^3.3.6","webpack-dev-server":"^3.7.2"},"scripts":{"start":"webpack-dev-server","build":"webpack --mode=production --env.WEBPACK_BUILD=true","test":"mocha \'./src/**/*-test.js\'","test:watch":"mocha \'./src/**/*-test.js\' --watch","precommit":"yarn lint && yarn style-check","lint":"eslint \'./src/**/*.*\'","style-check":"prettier --check \'./src/**/*.js\'","style-fix":"prettier --write \'./src/**/*.js\'","compile-types":"tsc --noEmit"}}',
+          );
+        },
+        function (e, t, n) {
+          const { logWarnings: i } = n(3),
+            r = n(0),
+            { oauthToken: s } = n(14);
+          class o {
+            constructor(e = {}) {
+              ((this._token = e.token),
+                (this._apiVersion = e.apiVersion),
+                (this.setToken = this.setToken.bind(this)),
+                (this.setApiVersion = this.setApiVersion.bind(this)),
+                (this.api = this.api.bind(this)));
+            }
+            setToken(e) {
+              this._token = e;
+            }
+            setApiVersion(e) {
+              this._apiVersion = e;
+            }
+            api(e, t = {}) {
+              const n = { query: e, variables: t.variables },
+                s = t.token || this._token,
+                o = t.apiVersion || this._apiVersion;
+              if (!s)
+                throw new Error(
+                  "Should send 'token' as an option or call mondaySdk.setToken(TOKEN)",
+                );
+              return r.execute(n, s, { apiVersion: o }).then(i);
+            }
+            oauthToken(e, t, n) {
+              return s(e, t, n);
+            }
+          }
+          e.exports = function (e = {}) {
+            return new o(e);
+          };
+        },
+        function (e, t, n) {
+          const { execute: i } = n(0),
+            { MONDAY_OAUTH_TOKEN_URL: r } = n(1);
+          e.exports = {
+            oauthToken: (e, t, n) =>
+              i({ code: e, client_id: t, client_secret: n }, null, { url: r }),
+          };
+        },
+      ]);
+    </script>
+    <style>
+      :root,
+      html[data-theme="light"] {
+        --page: #f6f7fb;
+        --card: #ffffff;
+        --text: #323338;
+        --text2: #676879;
+        --icon: #676879;
+        --border: #d0d4e4;
+        --ui-border: #c3c6d4;
+        --track: #e7e9ef;
+        --hover: rgba(103, 104, 121, 0.1);
+        --primary: #0073ea;
+        --primary-hover: #0060b9;
+        --primary-selected: #cce5ff;
+        --on-primary: #ffffff;
+        --positive: #00854d;
+        --negative: #d83a52;
+        --negative-selected: #f4c3cb;
+        --shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        --label-done: #00c875;
+        --label-working: #fdab3d;
+        --label-stuck: #df2f4a;
+        --label-blue: #579bfc;
+        --label-empty: #c4c4c4;
+        --label-grass: #037f4c;
+      }
+      html[data-theme="dark"] {
+        --page: #181b34;
+        --card: #30324e;
+        --text: #d5d8df;
+        --text2: #9699a6;
+        --icon: #c3c6d4;
+        --border: #4b4e69;
+        --ui-border: #797e93;
+        --track: #434660;
+        --hover: rgba(103, 104, 121, 0.3);
+        --primary-selected: #133774;
+        --negative-selected: #642830;
+        --shadow: 0 4px 8px rgba(9, 11, 25, 0.5);
+      }
+      html[data-theme="black"] {
+        --page: #111111;
+        --card: #2c2c2c;
+        --text: #eeeeee;
+        --text2: #aaaaaa;
+        --icon: #aaaaaa;
+        --border: #636363;
+        --ui-border: #8d8d8d;
+        --track: #4d4d4d;
+        --hover: rgba(103, 104, 121, 0.3);
+        --primary-selected: #133774;
+        --negative-selected: #642830;
+        --shadow: 0 4px 8px #000000;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--card);
+        color: var(--text);
+        font-family: Figtree, Roboto, "Segoe UI", system-ui, sans-serif;
+        font-size: 13px;
+        line-height: 1.35;
+        font-variant-numeric: tabular-nums;
+      }
+      #app {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .project {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex: 1 1 auto;
+        padding: 8px 12px 10px;
+        gap: 6px;
+      }
+      .pname {
+        font-family: Poppins, Figtree, sans-serif;
+        font-weight: 500;
+        font-size: 13px;
+        color: var(--text2);
+      }
+      .info {
+        font-size: 11.5px;
+        color: var(--text2);
+      }
+      .scroll {
+        flex: 1 1 auto;
+        min-height: 160px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        position: relative;
+      }
+      .inner {
+        display: flex;
+        align-items: flex-start;
+      }
+      .grid {
+        position: sticky;
+        left: 0;
+        z-index: 3;
+        background: var(--card);
+        border-right: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .ghead,
+      .chead {
+        position: sticky;
+        top: 0;
+        height: 40px;
+        background: var(--page);
+        border-bottom: 1px solid var(--border);
+      }
+      .ghead {
+        z-index: 4;
+        display: flex;
+        align-items: flex-end;
+      }
+      .chead {
+        z-index: 2;
+      }
+      .gcell {
+        padding: 0 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ghead .gcell {
+        font-size: 11.5px;
+        color: var(--text2);
+        padding-bottom: 6px;
+      }
+      .num {
+        text-align: right;
+      }
+      .grow {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        border-bottom: 1px solid var(--border);
+      }
+      .grow.pkg {
+        background: var(--page);
+        font-weight: 600;
+      }
+      .grow.inst {
+        background: var(--page);
+        font-weight: 500;
+      }
+      .grow.inst .gcell:first-child {
+        padding-left: 18px;
+      }
+      .grow.task .gcell:first-child {
+        padding-left: 30px;
+      }
+      .good {
+        color: var(--label-grass);
+      }
+      .bad {
+        color: var(--label-stuck);
+      }
+      html[data-theme="dark"] .good,
+      html[data-theme="black"] .good {
+        color: var(--label-done);
+      }
+      .chart {
+        position: relative;
+        flex-shrink: 0;
+      }
+      .month {
+        position: absolute;
+        top: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+      }
+      .day {
+        position: absolute;
+        top: 22px;
+        width: 22px;
+        text-align: center;
+        font-size: 10.5px;
+        color: var(--text2);
+      }
+      .day.now {
+        color: var(--primary);
+        font-weight: 700;
+      }
+      .pill {
+        position: absolute;
+        top: 2px;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: #fff;
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 1px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        z-index: 3;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        font-size: 11.5px;
+        color: var(--text2);
+        align-items: center;
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .sw {
+        display: inline-block;
+        width: 18px;
+        height: 8px;
+        border-radius: 4px;
+      }
+      :root {
+        --late-tint: #f9d5db;
+        --ok-tint: #cce5d9;
+      }
+      html[data-theme="dark"],
+      html[data-theme="black"] {
+        --late-tint: #5a2330;
+        --ok-tint: #1e4a36;
+      }
+      .problem {
+        border: 1px dashed var(--ui-border);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        margin: 12px;
+      }
+      .problem .h {
+        margin: 0 0 4px;
+        font-family: Poppins, Figtree, sans-serif;
+        font-weight: 500;
+      }
+      .problem .s {
+        margin: 0;
+        color: var(--text2);
+        font-size: 13px;
+      }
+      .loading {
+        padding: 20px;
+        color: var(--text2);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="loading">Loading the marked-up programme…</div>
+    </div>
+    <script>
+      // ---- Programme working calendar (identical code in the Programme Planner, My week and the weekly snapshot) ----
+      // The project board's description carries one line, written by the planner's import (or typed by hand):
+      //   Working calendar (from MS Project): Mon–Sat · non-working 21 Dec 2026 – 3 Jan 2027; 6 Apr 2027 · working 28 Dec 2026
+      // With it, working days follow the programme's MS Project calendar; without it every tool counts Monday–Friday.
+      const CAL_DAY = 86400000;
+      const CAL_MON = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+      ];
+      const CAL_WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      function calDayNum(y, m, d) {
+        return Math.round(Date.UTC(y, m, d) / CAL_DAY);
+      } // whole days since 1 Jan 1970
+      function calWeekday(dn) {
+        return ((dn % 7) + 7 + 4) % 7;
+      } // 1 Jan 1970 was a Thursday
+      function calParseDate(s) {
+        s = String(s || "").trim();
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return calDayNum(+m[1], +m[2] - 1, +m[3]);
+        m = s.match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?\s+'?(\d{2,4})$/);
+        if (!m) return null;
+        const mo = CAL_MON.indexOf(m[2].toLowerCase());
+        if (mo < 0) return null;
+        let y = +m[3];
+        if (y < 100) y += 2000;
+        return calDayNum(y, mo, +m[1]);
+      }
+      function calParseRanges(s) {
+        const out = [];
+        String(s || "")
+          .split(/[;,]/)
+          .forEach((piece) => {
+            const ends = piece.trim().split(/\s+(?:[–—-]|to)\s+/i);
+            const a = calParseDate(ends[0]),
+              b = ends.length > 1 ? calParseDate(ends[1]) : a;
+            if (a != null && b != null)
+              out.push([Math.min(a, b), Math.max(a, b)]);
+          });
+        return out;
+      }
+      function makeWorkingCalendar(days, off, on) {
+        const START = calDayNum(2015, 0, 1),
+          END = calDayNum(2045, 11, 31);
+        const work = new Uint8Array(END - START + 1);
+        for (let dn = START; dn <= END; dn++)
+          work[dn - START] = days[calWeekday(dn)] ? 1 : 0;
+        const mark = (ranges, v) =>
+          ranges.forEach(([a, b]) => {
+            for (let dn = Math.max(a, START); dn <= Math.min(b, END); dn++)
+              work[dn - START] = v;
+          });
+        mark(off, 0);
+        mark(on, 1); // extra working days win
+        const cum = new Int32Array(work.length + 1);
+        for (let i = 0; i < work.length; i++) cum[i + 1] = cum[i] + work[i];
+        const isWork = (dn) =>
+          dn < START || dn > END
+            ? !!days[calWeekday(dn)]
+            : work[dn - START] === 1;
+        return {
+          days,
+          off,
+          on,
+          isWork,
+          count(a, b) {
+            // working days from a to b, both included
+            if (b < a) return 0;
+            if (a >= START && b <= END)
+              return cum[b - START + 1] - cum[a - START];
+            let n = 0;
+            for (let dn = a; dn <= b; dn++) if (isWork(dn)) n++;
+            return n;
+          },
+        };
+      }
+      function parseWorkingCalendar(text) {
+        const lines = String(text || "").split(/\r?\n/);
+        const at = lines.findIndex((l) =>
+          /working calendar\s*\(from ms project\)\s*:/i.test(l),
+        );
+        if (at < 0) return null;
+        // the line may have been broken by hand: follow it while it clearly continues
+        let body = lines[at].replace(
+          /^.*?working calendar\s*\(from ms project\)\s*:\s*/i,
+          "",
+        );
+        for (let k = at + 1; k < lines.length; k++) {
+          const next = lines[k].trim();
+          if (!next) break;
+          if (
+            /[-–—·•|;,]\s*$/.test(body) ||
+            /^(non|working|\d|[·•|;,])/i.test(next)
+          )
+            body += " " + next;
+          else break;
+        }
+        const parts = body.split(/\s*[·•|]\s*/);
+        const DAYS = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+        const days = [false, false, false, false, false, false, false];
+        const dp = (parts.shift() || "").toLowerCase();
+        const rng = dp.match(
+          /^(sun|mon|tue|wed|thu|fri|sat)[a-z]*\s*[–—-]\s*(sun|mon|tue|wed|thu|fri|sat)/,
+        );
+        if (rng) {
+          for (let i = DAYS[rng[1]], g = 0; g < 7; i = (i + 1) % 7, g++) {
+            days[i] = true;
+            if (i === DAYS[rng[2]]) break;
+          }
+        } else
+          (dp.match(/sun|mon|tue|wed|thu|fri|sat/g) || []).forEach((k) => {
+            days[DAYS[k]] = true;
+          });
+        if (!days.some(Boolean)) return null;
+        const off = [],
+          on = [];
+        parts.forEach((p) => {
+          const mm = p.match(/^(non[\s-]*working|working)\s+(.*)$/i);
+          if (!mm) return;
+          (/^non/i.test(mm[1]) ? off : on).push(...calParseRanges(mm[2]));
+        });
+        return makeWorkingCalendar(days, off, on);
+      }
+      function calFmtDate(dn) {
+        const d = new Date(dn * CAL_DAY);
+        return (
+          d.getUTCDate() +
+          " " +
+          CAL_MON[d.getUTCMonth()][0].toUpperCase() +
+          CAL_MON[d.getUTCMonth()].slice(1) +
+          " " +
+          d.getUTCFullYear()
+        );
+      }
+      function formatWorkingCalendar(days, off, on) {
+        const order = [1, 2, 3, 4, 5, 6, 0],
+          idx = order.filter((i) => days[i]);
+        const first = order.indexOf(idx[0]),
+          last = order.indexOf(idx[idx.length - 1]);
+        const contiguous = idx.length > 1 && last - first + 1 === idx.length;
+        const dayText = contiguous
+          ? `${CAL_WD[idx[0]]}–${CAL_WD[idx[idx.length - 1]]}`
+          : idx.map((i) => CAL_WD[i]).join(", ");
+        const merge = (rs) =>
+          rs
+            .slice()
+            .sort((a, b) => a[0] - b[0])
+            .reduce((acc, r) => {
+              const l = acc[acc.length - 1];
+              if (l && r[0] <= l[1] + 1) l[1] = Math.max(l[1], r[1]);
+              else acc.push(r.slice());
+              return acc;
+            }, []);
+        const fmt = (rs) =>
+          merge(rs)
+            .map(([a, b]) =>
+              a === b ? calFmtDate(a) : `${calFmtDate(a)} – ${calFmtDate(b)}`,
+            )
+            .join("; ");
+        let line = `Working calendar (from MS Project): ${dayText}`;
+        if (off.length) line += ` · non-working ${fmt(off)}`;
+        if (on.length) line += ` · working ${fmt(on)}`;
+        return line;
+      }
+      // ---- end of shared calendar code ----
+
+      // POAP reads current values directly from each project board.
+      var PROJECT_COLS = {
+        actual: { id: "numeric_mm85vp3d", title: "actual %" },
+        timeline: { id: "", title: "timeline" },
+        index: { id: "", title: "index" },
+        // Latest Baseline: filled by the planner's import. monday's "Baseline of Timeline (…)" columns are no longer used.
+        baseline: {
+          id: "5103953529__timerange_mm8b45mv",
+          title: "latest baseline",
+        },
+      };
+      // tracked tasks: the lowest rows (nothing under them) with an Install / Installation / Installations row anywhere above
+      var TRACKED_PARENT = /^install(ation)?s?$/;
+      function installChain(it, byId, hasKids) {
+        // the rows above a tracked task, nearest first; null if it isn't one
+        if (hasKids[it.id]) return null;
+        var chain = [],
+          cur = it.parent_item && byId[it.parent_item.id],
+          g = 0;
+        while (cur && g++ < 12) {
+          chain.push(cur);
+          cur = cur.parent_item && byId[cur.parent_item.id];
+        }
+        var top = -1;
+        chain.forEach(function (a, k) {
+          if (TRACKED_PARENT.test(norm(a.name))) top = k;
+        });
+        return top < 0 ? null : { chain: chain, top: top };
+      }
+
+      var monday = window.mondaySdk();
+      function norm(s) {
+        return String(s || "")
+          .toLowerCase()
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[c];
+        });
+      }
+      function api(query, variables) {
+        return monday
+          .api(query, { variables: variables || {} })
+          .then(function (res) {
+            if (!res) throw new Error("monday sent back an empty reply.");
+            if (res.errors && res.errors.length)
+              throw new Error(
+                res.errors
+                  .map(function (e) {
+                    return e.message;
+                  })
+                  .join("; "),
+              );
+            if (res.error_message) throw new Error(res.error_message);
+            return res.data;
+          });
+      }
+      function applyTheme(t) {
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" || t === "black" ? t : "light",
+        );
+      }
+      function idsFromContext(ctx) {
+        var ids =
+          ctx.boardIds && ctx.boardIds.length
+            ? ctx.boardIds
+            : ctx.boardId
+              ? [ctx.boardId]
+              : [];
+        return ids.map(String).filter(function (v, i, a) {
+          return v && a.indexOf(v) === i;
+        });
+      }
+      function getContext() {
+        return new Promise(function (resolve, reject) {
+          var done = false,
+            tries = 0;
+          function attempt() {
+            if (done) return;
+            tries++;
+            monday.get("context").then(
+              function (r) {
+                var c = r && r.data;
+                if (
+                  !done &&
+                  c &&
+                  (c.instanceType ||
+                    c.boardId ||
+                    (c.boardIds && c.boardIds.length))
+                ) {
+                  done = true;
+                  clearInterval(timer);
+                  resolve(c);
+                }
+              },
+              function () {},
+            );
+          }
+          var timer = setInterval(function () {
+            if (tries >= 10) {
+              clearInterval(timer);
+              if (!done) {
+                done = true;
+                reject(new Error("NO_MONDAY"));
+              }
+              return;
+            }
+            attempt();
+          }, 2000);
+          attempt();
+        });
+      }
+      // ---- dates as whole days (UTC day numbers) ----
+      function dnOf(iso) {
+        if (!iso) return null;
+        var p = String(iso).slice(0, 10).split("-").map(Number);
+        return p.length === 3 && p[0] ? calDayNum(p[0], p[1] - 1, p[2]) : null;
+      }
+      function dnToday() {
+        if (window.TEST_TODAY) return dnOf(window.TEST_TODAY);
+        var n = new Date();
+        return calDayNum(n.getFullYear(), n.getMonth(), n.getDate());
+      }
+      function fmtDn(dn, withDay) {
+        var d = new Date(dn * CAL_DAY);
+        return (
+          (withDay === false ? "" : CAL_WD[d.getUTCDay()] + " ") +
+          d.getUTCDate() +
+          " " +
+          CAL_MON[d.getUTCMonth()][0].toUpperCase() +
+          CAL_MON[d.getUTCMonth()].slice(1, 3)
+        );
+      }
+      function fmtWhen(dt) {
+        return (
+          dt.toLocaleDateString("en-GB", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          }) +
+          " " +
+          dt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+        );
+      }
+      function makeIsWork(cal) {
+        return function (dn) {
+          if (cal) return cal.isWork(dn);
+          var w = calWeekday(dn);
+          return w >= 1 && w <= 5;
+        };
+      }
+      function makeCount(cal) {
+        return function (a, b) {
+          if (b < a) return 0;
+          if (cal) return cal.count(a, b);
+          var n = 0;
+          for (var d = a; d <= b; d++) {
+            var w = calWeekday(d);
+            if (w >= 1 && w <= 5) n++;
+          }
+          return n;
+        };
+      }
+      // ---- the project board: name, calendar line, columns ----
+      function readBoard(boardId) {
+        return api(
+          "query ($b: [ID!]) { boards(ids: $b, hierarchy_types: [classic, multi_level]) { id name description columns { id title type } } }",
+          { b: [boardId] },
+        )
+          .catch(function () {
+            return api(
+              "query ($b: [ID!]) { boards(ids: $b) { id name description columns { id title type } } }",
+              { b: [boardId] },
+            );
+          })
+          .then(function (d) {
+            var b = d && d.boards && d.boards[0];
+            if (!b) throw new Error("This board could not be read.");
+            var find = function (spec) {
+              return (
+                (spec.id &&
+                  b.columns.filter(function (c) {
+                    return c.id === spec.id;
+                  })[0]) ||
+                b.columns.filter(function (c) {
+                  return norm(c.title) === spec.title;
+                })[0] ||
+                null
+              );
+            };
+            return {
+              id: String(b.id),
+              name: b.name,
+              cal: parseWorkingCalendar(b.description),
+              cols: {
+                actual: find(PROJECT_COLS.actual),
+                timeline: find(PROJECT_COLS.timeline),
+                index: find(PROJECT_COLS.index),
+                baseline: find(PROJECT_COLS.baseline),
+              },
+            };
+          });
+      }
+      function problemHtml(title, body) {
+        return (
+          '<div class="problem"><p class="h">' +
+          esc(title) +
+          '</p><p class="s">' +
+          body +
+          "</p></div>"
+        );
+      }
+
+      var DPX = 22,
+        ROW = 30,
+        GRID_W = [180, 70, 62, 76];
+      var RED = "#DF2F4A",
+        GREEN = "#037F4C",
+        DONE = "#00C875";
+      function areaOf(name) {
+        var s = String(name || "");
+        var i = s.search(/[-–—]/);
+        return (i > 0 ? s.slice(0, i) : s).trim();
+      }
+      function natural(a, b) {
+        return String(a).localeCompare(String(b), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
+      }
+
+      // Two-stage retrieval: paginate lightweight item IDs in board order, then
+      // retrieve only the four required columns via independent 100-item batches.
+      // Unlike cursor pages, ID batches can run concurrently. On any mismatch
+      // or API incompatibility we fall back to the original full-page query.
+      function readItems(boardId, colIds) {
+        var PAGE_SIZE = 500;
+        var BATCH_SIZE = 100; // monday's documented items(ids:) maximum
+        var WORKERS = 8;
+        var timings = {
+          strategy: "parallel-details",
+          pageCount: 0,
+          batchCount: 0,
+        };
+        var started = performance.now();
+        var minimal = "id name parent_item { id }";
+        var full = function (cap) {
+          return (
+            minimal +
+            " column_values(ids: $c" +
+            (cap ? ", capabilities: [CALCULATED]" : "") +
+            ") { id text value ... on NumbersValue { number } ... on TimelineValue { from to } }"
+          );
+        };
+        function pageFirst(fields, cap) {
+          // The lightweight discovery query does not use $c. GraphQL rejects
+          // queries declaring unused variables, so include it only for detail pages.
+          var usesColumns = fields.indexOf("column_values(") !== -1;
+          return api(
+            "query ($b: [ID!]" +
+              (usesColumns ? ", $c: [String!]" : "") +
+              ") { boards(ids: $b) { items_page(limit: " +
+              PAGE_SIZE +
+              ', hierarchy_scope_config: "allItems") { cursor items { ' +
+              fields +
+              " } } } }",
+            usesColumns ? { b: [boardId], c: colIds } : { b: [boardId] },
+          ).then(function (d) {
+            if (!d || !d.boards || !d.boards[0] || !d.boards[0].items_page)
+              throw new Error("Missing first items page");
+            return d.boards[0].items_page;
+          });
+        }
+        function pageNext(cursor, fields) {
+          var usesColumns = fields.indexOf("column_values(") !== -1;
+          return api(
+            "query ($cur: String!" +
+              (usesColumns ? ", $c: [String!]" : "") +
+              ") { next_items_page(limit: " +
+              PAGE_SIZE +
+              ", cursor: $cur) { cursor items { " +
+              fields +
+              " } } }",
+            usesColumns ? { cur: cursor, c: colIds } : { cur: cursor },
+          ).then(function (d) {
+            if (!d || !d.next_items_page)
+              throw new Error("Missing next items page");
+            return d.next_items_page;
+          });
+        }
+        function enumerate(fields) {
+          var rows = [];
+          var seenCursors = new Set();
+          function accept(page) {
+            timings.pageCount++;
+            if (!page || !Array.isArray(page.items))
+              throw new Error("Invalid item page");
+            for (var i = 0; i < page.items.length; i++)
+              rows.push(page.items[i]);
+            if (!page.cursor) return Promise.resolve(rows);
+            if (seenCursors.has(page.cursor))
+              throw new Error("Repeated items cursor");
+            seenCursors.add(page.cursor);
+            return pageNext(page.cursor, fields).then(accept);
+          }
+          return pageFirst(fields).then(accept);
+        }
+        function detailBatch(ids, cap) {
+          return api(
+            "query ($ids: [ID!], $c: [String!]) { items(ids: $ids, limit: 100) { " +
+              full(cap) +
+              " } }",
+            { ids: ids, c: colIds },
+          ).then(function (d) {
+            if (!d || !Array.isArray(d.items))
+              throw new Error("Missing detail items");
+            return d.items;
+          });
+        }
+        function readDetails(rows, cap) {
+          var batches = [];
+          for (var i = 0; i < rows.length; i += BATCH_SIZE)
+            batches.push(
+              rows.slice(i, i + BATCH_SIZE).map(function (it) {
+                return it.id;
+              }),
+            );
+          timings.batchCount = batches.length;
+          var results = new Array(batches.length);
+          var next = 0;
+          var firstError = null;
+          function worker() {
+            if (firstError || next >= batches.length) return Promise.resolve();
+            var index = next++;
+            return detailBatch(batches[index], cap).then(
+              function (items) {
+                results[index] = items;
+                return worker();
+              },
+              function (error) {
+                // Drain in-flight requests before retrying or falling back.
+                if (!firstError) firstError = error;
+              },
+            );
+          }
+          var workers = [];
+          for (var j = 0; j < Math.min(WORKERS, batches.length); j++)
+            workers.push(worker());
+          return Promise.all(workers).then(function () {
+            if (firstError) throw firstError;
+            var byId = new Map();
+            results.forEach(function (batch) {
+              batch.forEach(function (it) {
+                if (!it || it.id == null || byId.has(String(it.id)))
+                  throw new Error("Duplicate or invalid detail item");
+                byId.set(String(it.id), it);
+              });
+            });
+            if (byId.size !== rows.length)
+              throw new Error("Detail item count mismatch");
+            return rows.map(function (base) {
+              var it = byId.get(String(base.id));
+              if (!it || !Array.isArray(it.column_values))
+                throw new Error("Missing detail values for item " + base.id);
+              // Preserve the exact original paginated ordering and parent links.
+              if (String(it.id) !== String(base.id))
+                throw new Error("ID mismatch");
+              return {
+                id: base.id,
+                name: base.name,
+                parent_item: base.parent_item,
+                column_values: it.column_values,
+              };
+            });
+          });
+        }
+        function fallback(reason) {
+          console.warn(
+            "[POAP Programme] Parallel retrieval unavailable; using original pagination:",
+            reason,
+          );
+          timings.strategy = "original-fallback";
+          timings.pageCount = 0;
+          timings.batchCount = 0;
+          function fullScan(cap) {
+            return enumerate(full(cap));
+          }
+          return fullScan(true).catch(function () {
+            timings.pageCount = 0;
+            return fullScan(false);
+          });
+        }
+        return enumerate(minimal)
+          .then(function (rows) {
+            timings.discoveryMs = Math.round(performance.now() - started);
+            if (
+              new Set(
+                rows.map(function (r) {
+                  return String(r.id);
+                }),
+              ).size !== rows.length
+            )
+              throw new Error("Duplicate item IDs in pagination");
+            var detailStart = performance.now();
+            return readDetails(rows, true)
+              .catch(function (err) {
+                // Some board/API configurations do not support calculated capabilities.
+                timings.batchCount = 0;
+                console.warn(
+                  "[POAP Programme] Retrying item details without calculated capability:",
+                  err,
+                );
+                return readDetails(rows, false);
+              })
+              .then(function (items) {
+                timings.detailsMs = Math.round(performance.now() - detailStart);
+                return items;
+              });
+          })
+          .catch(fallback)
+          .then(function (items) {
+            timings.itemCount = items.length;
+            timings.totalMs = Math.round(performance.now() - started);
+            console.info(
+              "[POAP Programme] Retrieval metrics",
+              boardId,
+              timings,
+            );
+            return items;
+          });
+      }
+      function cvOf(it, colId) {
+        return colId
+          ? (it.column_values || []).filter(function (v) {
+              return v.id === colId;
+            })[0] || null
+          : null;
+      }
+      function numOf(v) {
+        if (!v) return null;
+        if (typeof v.number === "number") return v.number;
+        var n = parseFloat(v.text);
+        return isNaN(n) ? null : n;
+      }
+      function datesOf(v) {
+        if (!v) return null;
+        var f = v.from,
+          t = v.to;
+        if (!f || !t) {
+          try {
+            var j = JSON.parse(v.value || "null");
+            if (j) {
+              f = j.from;
+              t = j.to;
+            }
+          } catch (e) {}
+        }
+        var a = dnOf(f),
+          b = dnOf(t);
+        return a != null && b != null ? [a, b] : null;
+      }
+
+      function build(board, items) {
+        var isWork = makeIsWork(board.cal),
+          count = makeCount(board.cal);
+        var today = dnToday();
+        var byId = {},
+          hasKids = {};
+        items.forEach(function (it) {
+          byId[it.id] = it;
+          if (it.parent_item) hasKids[it.parent_item.id] = 1;
+        });
+        var top = function (it) {
+          var cur = it,
+            g = 0;
+          while (cur.parent_item && byId[cur.parent_item.id] && g++ < 10)
+            cur = byId[cur.parent_item.id];
+          return cur;
+        };
+        var C = board.cols,
+          pkgs = {},
+          order = [];
+        items.forEach(function (it) {
+          var ic = installChain(it, byId, hasKids);
+          if (!ic) return;
+          var par = ic.chain[0];
+          var tl = datesOf(cvOf(it, C.timeline && C.timeline.id)),
+            bl = datesOf(cvOf(it, C.baseline && C.baseline.id));
+          var plan = bl || tl;
+          if (!plan) return;
+          var s = plan[0],
+            f = plan[1],
+            D = Math.max(count(s, f), 1);
+          var actual = Math.max(
+            0,
+            Math.min(100, numOf(cvOf(it, C.actual && C.actual.id)) || 0),
+          );
+          var elapsed = today >= s ? count(s, today) : -count(today + 1, s - 1);
+          var planned =
+            today < s
+              ? 0
+              : today > f
+                ? 100
+                : Math.round((Math.min(elapsed, D) / D) * 100);
+          var p = (actual / 100) * D,
+            daysLate = Math.round((elapsed - p) * 10) / 10;
+          var kind =
+            actual >= 100
+              ? "done"
+              : planned === 0 && actual === 0
+                ? "notstarted"
+                : daysLate > 0.05
+                  ? "behind"
+                  : "ontrack";
+          var pk = top(it);
+          if (!pkgs[pk.id]) {
+            pkgs[pk.id] = {
+              id: pk.id,
+              name: pk.name,
+              idx: numOf(cvOf(pk, C.index && C.index.id)),
+              insts: {},
+            };
+            order.push(pk.id);
+          }
+          var P = pkgs[pk.id];
+          // group label: from the Install row down to the task's own parent ("Install › Beam Encasements"), no repeated names
+          var lbl = [];
+          ic.chain
+            .slice(0, ic.top + 1)
+            .reverse()
+            .forEach(function (a) {
+              if (lbl[lbl.length - 1] !== a.name) lbl.push(a.name);
+            });
+          if (!P.insts[par.id])
+            P.insts[par.id] = {
+              id: par.id,
+              name: lbl.join(" › "),
+              idx: numOf(cvOf(par, C.index && C.index.id)),
+              tasks: [],
+            };
+          P.insts[par.id].tasks.push({
+            id: it.id,
+            name: it.name,
+            idx: numOf(cvOf(it, C.index && C.index.id)),
+            s: s,
+            f: f,
+            other: bl ? tl : null,
+            D: D,
+            actual: actual,
+            planned: planned,
+            p: p,
+            daysLate: daysLate,
+            kind: kind,
+            started: kind !== "done" && (actual > 0 || today >= s),
+          });
+        });
+        // same order as the planner: top-level items by Area, then programme order (Index; else the board's own order)
+        var seq = {};
+        items.forEach(function (it, k) {
+          seq[it.id] = k;
+        });
+        var byIdx = function (a, b) {
+          return (
+            (a.idx == null ? Infinity : a.idx) -
+              (b.idx == null ? Infinity : b.idx) || seq[a.id] - seq[b.id]
+          );
+        };
+        var list = order
+          .map(function (k) {
+            return pkgs[k];
+          })
+          .sort(function (a, b) {
+            return natural(areaOf(a.name), areaOf(b.name)) || byIdx(a, b);
+          });
+        var rows = [];
+        var agg = function (tasks) {
+          var den = 0,
+            pl = 0,
+            ac = 0,
+            worst = null,
+            allDone = true,
+            s = Infinity,
+            f = -Infinity;
+          tasks.forEach(function (t) {
+            den += t.D;
+            pl += t.planned * t.D;
+            ac += t.actual * t.D;
+            s = Math.min(s, t.s);
+            f = Math.max(f, t.f);
+            if (t.kind !== "done") allDone = false;
+            if (t.kind !== "done" && t.kind !== "notstarted")
+              worst = worst == null ? t.daysLate : Math.max(worst, t.daysLate);
+          });
+          return {
+            planned: Math.round(pl / den),
+            actual: Math.round(ac / den),
+            worst: worst,
+            allDone: allDone,
+            s: s,
+            f: f,
+          };
+        };
+        list.forEach(function (P) {
+          var insts = Object.keys(P.insts).map(function (k) {
+            return P.insts[k];
+          });
+          insts.forEach(function (I) {
+            I.tasks.sort(function (a, b) {
+              return byIdx(a, b);
+            });
+          });
+          rows.push({
+            type: "pkg",
+            name: P.name,
+            a: agg(
+              [].concat.apply(
+                [],
+                insts.map(function (I) {
+                  return I.tasks;
+                }),
+              ),
+            ),
+          });
+          insts.sort(byIdx).forEach(function (I) {
+            rows.push({ type: "inst", name: I.name, a: agg(I.tasks) });
+            I.tasks.forEach(function (t) {
+              rows.push({ type: "task", name: t.name, t: t });
+            });
+          });
+        });
+        return { rows: rows, today: today, isWork: isWork };
+      }
+
+      function daysText(v, kind) {
+        if (kind === "done") return { t: "✓", c: "good" };
+        if (v == null || kind === "notstarted") return { t: "–", c: "" };
+        if (v > 0.05) return { t: v.toFixed(1), c: "bad" };
+        if (v < -0.05) return { t: (-v).toFixed(1) + " ahead", c: "good" };
+        return { t: "On plan", c: "good" };
+      }
+
+      function render(board, model) {
+        var rows = model.rows,
+          today = model.today,
+          isWork = model.isWork;
+        if (!rows.length)
+          return (
+            '<div class="project">' +
+            problemHtml(
+              "No installation tasks yet",
+              "Tasks under an Install or Installations row appear here.",
+            ) +
+            "</div>"
+          );
+        var lo = Infinity,
+          hi = -Infinity;
+        rows.forEach(function (r) {
+          if (r.t) {
+            lo = Math.min(lo, r.t.s, r.t.other ? r.t.other[0] : Infinity);
+            hi = Math.max(hi, r.t.f, r.t.other ? r.t.other[1] : -Infinity);
+          }
+        });
+        lo = Math.min(lo, today) - 3;
+        hi = Math.max(hi, today) + 4;
+        var x = function (dn) {
+            return (dn - lo) * DPX;
+          },
+          endX = function (dn) {
+            return x(dn) + DPX;
+          };
+        var W = (hi - lo + 1) * DPX,
+          H = rows.length * ROW,
+          gw = GRID_W.reduce(function (a, b) {
+            return a + b;
+          }, 0);
+        var statusX = endX(today);
+        // grid
+        var cell = function (txt, w, cls) {
+          return (
+            '<div class="gcell ' +
+            (cls || "") +
+            '" style="width:' +
+            w +
+            'px">' +
+            txt +
+            "</div>"
+          );
+        };
+        var grid =
+          '<div class="grid" style="width:' +
+          gw +
+          'px"><div class="ghead">' +
+          cell("Task", GRID_W[0]) +
+          cell("Planned", GRID_W[1], "num") +
+          cell("Actual", GRID_W[2], "num") +
+          cell("Days late", GRID_W[3], "num") +
+          "</div>" +
+          rows
+            .map(function (r) {
+              if (r.type !== "task") {
+                var a = r.a,
+                  dt = a.allDone
+                    ? { t: "✓", c: "good" }
+                    : daysText(a.worst, a.worst == null ? "notstarted" : "");
+                return (
+                  '<div class="grow ' +
+                  r.type +
+                  '">' +
+                  cell(esc(r.name), GRID_W[0]) +
+                  cell(a.planned + "%", GRID_W[1], "num") +
+                  cell(
+                    a.actual + "%",
+                    GRID_W[2],
+                    "num " + (a.actual < a.planned ? "bad" : "good"),
+                  ) +
+                  cell(dt.t, GRID_W[3], "num " + dt.c) +
+                  "</div>"
+                );
+              }
+              var t = r.t,
+                d = daysText(t.daysLate, t.kind);
+              return (
+                '<div class="grow task">' +
+                cell(esc(t.name), GRID_W[0]) +
+                cell(t.planned + "%", GRID_W[1], "num") +
+                cell(
+                  t.actual + "%",
+                  GRID_W[2],
+                  "num " +
+                    (t.kind === "behind"
+                      ? "bad"
+                      : t.kind === "notstarted"
+                        ? ""
+                        : "good"),
+                ) +
+                cell(d.t, GRID_W[3], "num " + d.c) +
+                "</div>"
+              );
+            })
+            .join("") +
+          "</div>";
+        // chart header: months and day numbers
+        var head = "",
+          mon = -1;
+        for (var dn = lo; dn <= hi; dn++) {
+          var dd = new Date(dn * CAL_DAY);
+          if (dd.getUTCMonth() !== mon) {
+            mon = dd.getUTCMonth();
+            head +=
+              '<div class="month" style="left:' +
+              (x(dn) + 4) +
+              'px">' +
+              CAL_MON[mon][0].toUpperCase() +
+              CAL_MON[mon].slice(1) +
+              " " +
+              dd.getUTCFullYear() +
+              "</div>";
+          }
+          head +=
+            '<div class="day' +
+            (dn === today ? " now" : "") +
+            '" style="left:' +
+            x(dn) +
+            'px">' +
+            dd.getUTCDate() +
+            "</div>";
+        }
+        head +=
+          '<div class="pill" style="left:' +
+          statusX +
+          'px">Status date · ' +
+          esc(fmtDn(today)) +
+          "</div>";
+        // chart body
+        var svg = "";
+        for (var d2 = lo; d2 <= hi; d2++)
+          if (!isWork(d2))
+            svg +=
+              '<rect x="' +
+              x(d2) +
+              '" y="0" width="' +
+              DPX +
+              '" height="' +
+              H +
+              '" fill="var(--page)"/>';
+        rows.forEach(function (r, i) {
+          if (r.type !== "task")
+            svg +=
+              '<rect x="0" y="' +
+              i * ROW +
+              '" width="' +
+              W +
+              '" height="' +
+              ROW +
+              '" fill="var(--page)" opacity=".7"/>';
+          svg +=
+            '<line x1="0" x2="' +
+            W +
+            '" y1="' +
+            ((i + 1) * ROW - 0.5) +
+            '" y2="' +
+            ((i + 1) * ROW - 0.5) +
+            '" stroke="var(--border)"/>';
+        });
+        var bars = "",
+          line = "M " + statusX + " 0",
+          dots = "",
+          labels = "";
+        var posX = function (s, p) {
+          if (p <= 1e-9) return x(s);
+          var k = Math.ceil(p - 1e-9) - 1,
+            fr = p - k,
+            d = s,
+            n = 0,
+            g = 0;
+          while (n < k && g++ < 4000) {
+            d++;
+            if (isWork(d)) n++;
+          }
+          return x(d) + fr * DPX;
+        };
+        rows.forEach(function (r, i) {
+          var y = i * ROW,
+            mid = y + ROW / 2;
+          if (r.type !== "task") {
+            var a = r.a;
+            bars +=
+              '<rect x="' +
+              x(a.s) +
+              '" y="' +
+              (mid - 3) +
+              '" width="' +
+              Math.max(endX(a.f) - x(a.s), 4) +
+              '" height="6" rx="3" fill="var(--text)"/>';
+            return;
+          }
+          var t = r.t,
+            x1 = x(t.s),
+            w = Math.max(endX(t.f) - x1, 4),
+            by = y + 8,
+            bh = 14;
+          if (t.other)
+            bars +=
+              '<line x1="' +
+              x(t.other[0]) +
+              '" x2="' +
+              endX(t.other[1]) +
+              '" y1="' +
+              (by + bh + 4) +
+              '" y2="' +
+              (by + bh + 4) +
+              '" stroke="var(--ui-border)" stroke-width="2"/>';
+          var st =
+            t.kind === "behind"
+              ? { tint: "var(--late-tint)", edge: RED, fill: RED }
+              : t.kind === "done"
+                ? { tint: DONE, edge: DONE, fill: DONE }
+                : t.kind === "notstarted"
+                  ? { tint: "var(--page)", edge: "#9699A6", fill: "#9699A6" }
+                  : { tint: "var(--ok-tint)", edge: GREEN, fill: GREEN };
+          bars +=
+            '<rect x="' +
+            x1 +
+            '" y="' +
+            by +
+            '" width="' +
+            w +
+            '" height="' +
+            bh +
+            '" rx="7" fill="' +
+            st.tint +
+            '" stroke="' +
+            st.edge +
+            '" stroke-width="1"/>' +
+            (t.actual > 0
+              ? '<rect x="' +
+                x1 +
+                '" y="' +
+                by +
+                '" width="' +
+                (w * t.actual) / 100 +
+                '" height="' +
+                bh +
+                '" rx="7" fill="' +
+                st.fill +
+                '"/>'
+              : "");
+          var px = t.started ? posX(t.s, t.p) : statusX;
+          line +=
+            " L " +
+            statusX +
+            " " +
+            (y + 2) +
+            " L " +
+            px +
+            " " +
+            mid +
+            " L " +
+            statusX +
+            " " +
+            (y + ROW - 2);
+          if (t.started)
+            dots +=
+              '<circle cx="' +
+              px +
+              '" cy="' +
+              mid +
+              '" r="5" fill="' +
+              RED +
+              '" stroke="#fff" stroke-width="2"/>';
+          if (t.kind === "behind" && t.daysLate > 0.05) {
+            var text = t.daysLate.toFixed(1) + " days late",
+              lw = text.length * 6.4 + 12,
+              lx = Math.max(statusX, x1 + w) + 8;
+            if (lx + lw > W - 4)
+              lx = Math.max(4, Math.min(px, x1, statusX) - lw - 8);
+            labels +=
+              '<rect x="' +
+              lx +
+              '" y="' +
+              (mid - 9) +
+              '" width="' +
+              lw +
+              '" height="18" rx="9" fill="var(--card)" stroke="' +
+              RED +
+              '"/><text x="' +
+              (lx + 6) +
+              '" y="' +
+              (mid + 4) +
+              '" font-size="11" font-weight="600" fill="' +
+              RED +
+              '" font-family="Figtree, Segoe UI, sans-serif">' +
+              text +
+              "</text>";
+          }
+        });
+        line += " L " + statusX + " " + H;
+        svg +=
+          bars +
+          '<line x1="' +
+          statusX +
+          '" x2="' +
+          statusX +
+          '" y1="0" y2="' +
+          H +
+          '" stroke="var(--primary)" stroke-dasharray="4 3"/>' +
+          '<path d="' +
+          line +
+          '" fill="none" stroke="' +
+          RED +
+          '" stroke-width="2" stroke-linejoin="round"/>' +
+          dots +
+          labels;
+        var chart =
+          '<div class="chart" style="width:' +
+          W +
+          'px"><div class="chead" style="width:' +
+          W +
+          'px">' +
+          head +
+          '</div><svg width="' +
+          W +
+          '" height="' +
+          H +
+          '" style="display:block">' +
+          svg +
+          "</svg></div>";
+        var legend =
+          '<div class="legend"><span><i class="sw" style="background:' +
+          RED +
+          '"></i>Late</span><span><i class="sw" style="background:' +
+          GREEN +
+          '"></i>On track</span><span><i class="sw" style="background:' +
+          DONE +
+          '"></i>Done</span>' +
+          '<span><i class="sw" style="height:2px;background:var(--ui-border)"></i>Current plan</span><span><i class="sw" style="width:2px;height:12px;background:var(--primary)"></i>Status date</span><span style="color:' +
+          RED +
+          ';font-weight:600">&lt; Progress line</span></div>';
+        var calText = board.cal
+          ? "working days from the MS Project calendar"
+          : "Mon–Fri working days";
+        return {
+          html:
+            '<div class="info">' +
+            "Live programme · status " +
+            esc(fmtDn(today)) +
+            " · measured against the latest baseline · " +
+            calText +
+            "</div>" +
+            '<div class="scroll"><div class="inner" style="width:' +
+            (gw + W) +
+            'px">' +
+            grid +
+            chart +
+            "</div></div>" +
+            legend,
+          scrollTo: Math.max(0, statusX + gw),
+        };
+      }
+
+      // Read current board values directly; no scheduled snapshot or history board required.
+      function loadProject(boardId) {
+        var startAt = performance.now();
+        var times = {};
+        return readBoard(boardId).then(function (b) {
+          times.boardMs = Math.round(performance.now() - startAt);
+          function finish(value) {
+            times.totalMs = Math.round(performance.now() - startAt);
+            console.info("[POAP Programme] Load metrics", boardId, times);
+            return value;
+          }
+          if (!b.cols.actual || !b.cols.timeline)
+            return finish({
+              name: b.name,
+              html: problemHtml(
+                "Board not set up",
+                "This board needs the “Timeline” and live “Actual %” columns.",
+              ),
+            });
+          var ids = [
+            b.cols.timeline.id,
+            b.cols.actual.id,
+            b.cols.baseline && b.cols.baseline.id,
+            b.cols.index && b.cols.index.id,
+          ].filter(Boolean);
+          var itemsStarted = performance.now();
+          return readItems(boardId, ids).then(function (items) {
+            times.itemsMs = Math.round(performance.now() - itemsStarted);
+            times.itemCount = items.length;
+            var processingStarted = performance.now();
+            var r = render(b, build(b, items));
+            times.buildRenderMs = Math.round(
+              performance.now() - processingStarted,
+            );
+            return finish(
+              typeof r === "string"
+                ? { name: b.name, html: r, cacheable: false }
+                : {
+                    name: b.name,
+                    html: r.html,
+                    scrollTo: r.scrollTo,
+                    cacheable: true,
+                  },
+            );
+          });
+        });
+      }
+
+      // Instant repeat-load UX: user-scoped, versioned, short-lived live-view cache.
+      // Cached data is always labelled and always refreshed from monday.com.
+      var POAP_CACHE_VERSION = "poap-v9-live-1";
+      var POAP_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+      var poapUserScope = "";
+      var poapLoadGeneration = 0;
+      function poapCacheKey(boardId) {
+        return POAP_CACHE_VERSION + ":" + poapUserScope + ":" + String(boardId);
+      }
+      function poapCacheRead(boardId) {
+        if (!poapUserScope) return null;
+        try {
+          var raw = localStorage.getItem(poapCacheKey(boardId));
+          if (!raw) return null;
+          var saved = JSON.parse(raw);
+          if (
+            !saved ||
+            !Number.isFinite(saved.savedAt) ||
+            Date.now() - saved.savedAt > POAP_CACHE_MAX_AGE_MS ||
+            Date.now() < saved.savedAt ||
+            typeof saved.html !== "string"
+          )
+            return null;
+          return saved;
+        } catch (e) {
+          return null;
+        } // third-party iframe storage may be blocked
+      }
+      function poapCacheWrite(boardId, result) {
+        if (!poapUserScope || !result || !result.cacheable || !result.html)
+          return;
+        try {
+          localStorage.setItem(
+            poapCacheKey(boardId),
+            JSON.stringify({
+              savedAt: Date.now(),
+              name: result.name,
+              html: result.html,
+              scrollTo: result.scrollTo || 0,
+            }),
+          );
+        } catch (e) {
+          /* quota and tracking protection must not break widget */
+        }
+      }
+      function poapCacheNotice(timestamp, refreshing, error) {
+        var when = new Date(timestamp).toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return (
+          '<div class="info" role="status" style="padding:5px 9px;background:var(--page);border:1px solid var(--border);border-radius:6px">' +
+          (error
+            ? "Cached programme · refresh failed · last updated "
+            : refreshing
+              ? "Cached programme · checking for updates · last updated "
+              : "Programme checked · updated ") +
+          esc(when) +
+          (error ? " · Reload to retry" : "") +
+          "</div>"
+        );
+      }
+      function poapPaint(app, list, cacheState, generation) {
+        if (generation !== poapLoadGeneration) return;
+        app.innerHTML = list
+          .map(function (p) {
+            return (
+              '<div class="project" data-to="' +
+              (p.scrollTo || 0) +
+              '">' +
+              (list.length > 1
+                ? '<div class="pname">' + esc(p.name) + "</div>"
+                : "") +
+              (cacheState && p.cachedAt
+                ? poapCacheNotice(
+                    p.cachedAt,
+                    cacheState === "refreshing",
+                    cacheState === "failed",
+                  )
+                : "") +
+              p.html +
+              "</div>"
+            );
+          })
+          .join("");
+        app.querySelectorAll(".project").forEach(function (pr) {
+          var sc = pr.querySelector(".scroll");
+          var to = Number(pr.getAttribute("data-to"));
+          if (sc && to) sc.scrollLeft = Math.max(0, to - sc.clientWidth * 0.6);
+        });
+      }
+      function start(ids) {
+        var generation = ++poapLoadGeneration;
+        var app = document.getElementById("app");
+        if (!ids.length) {
+          app.innerHTML = problemHtml(
+            "No board connected",
+            "Add this widget to a project board’s POAP view, or connect a project board in the widget’s settings.",
+          );
+          return;
+        }
+        var cached = ids.map(function (id) {
+          var saved = poapCacheRead(id);
+          return saved
+            ? {
+                name: saved.name || "Board " + id,
+                html: saved.html,
+                scrollTo: saved.scrollTo,
+                cachedAt: saved.savedAt,
+              }
+            : null;
+        });
+        var hasCompleteCache = cached.every(Boolean);
+        if (hasCompleteCache) {
+          poapPaint(app, cached, "refreshing", generation);
+          console.info(
+            "[POAP Programme] Displayed cached live view",
+            ids.join(","),
+            {
+              maxAgeMinutes: Math.round(
+                Math.max.apply(
+                  null,
+                  cached.map(function (p) {
+                    return Date.now() - p.cachedAt;
+                  }),
+                ) / 60000,
+              ),
+            },
+          );
+        } else {
+          app.innerHTML =
+            '<div class="loading">Loading the marked-up programme…</div>';
+        }
+        // Never treat a cached report as live. Refresh in this tab on every entry.
+        Promise.all(
+          ids.map(function (id) {
+            return loadProject(id)
+              .then(function (result) {
+                if (!result.cacheable) {
+                  var previous = poapCacheRead(id);
+                  if (previous)
+                    return {
+                      name: previous.name || "Board " + id,
+                      html: previous.html,
+                      scrollTo: previous.scrollTo,
+                      cachedAt: previous.savedAt,
+                      refreshFailed: true,
+                    };
+                  return result;
+                }
+                poapCacheWrite(id, result);
+                return result;
+              })
+              .catch(function (error) {
+                console.warn(
+                  "[POAP Programme] Refresh failed for board",
+                  id,
+                  error,
+                );
+                var saved = poapCacheRead(id);
+                return saved
+                  ? {
+                      name: saved.name || "Board " + id,
+                      html: saved.html,
+                      scrollTo: saved.scrollTo,
+                      cachedAt: saved.savedAt,
+                      refreshFailed: true,
+                    }
+                  : {
+                      name: "Board " + id,
+                      html: problemHtml(
+                        "Couldn't load this project",
+                        esc(error.message || error),
+                      ),
+                    };
+              });
+          }),
+        ).then(function (list) {
+          if (generation !== poapLoadGeneration) return;
+          var failed = list.some(function (p) {
+            return p.refreshFailed;
+          });
+          if (failed && hasCompleteCache) {
+            poapPaint(app, cached, "failed", generation);
+          } else {
+            poapPaint(app, list, failed ? "failed" : null, generation);
+          }
+        });
+      }
+
+      getContext().then(
+        function (ctx) {
+          applyTheme(ctx.theme);
+          poapUserScope = String(ctx.userId || (ctx.user && ctx.user.id) || "");
+          var current = idsFromContext(ctx);
+          start(current);
+          try {
+            monday.listen("context", function (res) {
+              var c = (res && res.data) || {};
+              if (c.theme) applyTheme(c.theme);
+              var next = idsFromContext(c);
+              if (next.join(",") !== current.join(",")) {
+                current = next;
+                start(current);
+              }
+            });
+          } catch (e) {}
+        },
+        function () {
+          document.getElementById("app").innerHTML = problemHtml(
+            "Open this inside monday",
+            "This widget shows the live marked-up programme on a project’s POAP view.",
+          );
+        },
+      );
+    </script>
+  </body>
+</html>
