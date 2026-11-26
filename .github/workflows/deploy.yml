@@ -1,0 +1,25 @@
+name: Site Installation Progress CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-installation-progress-production
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    uses: Holden-Installations/shared-workflows/.github/workflows/monday-deploy.yml@multi-folder-support
+    with:
+      app_id: '12415793'
+      app_name: 'Site Installation Progress'
+      multi_folder: true
+    secrets:
+      MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
