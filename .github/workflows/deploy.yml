@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   pipeline:
-    uses: Holden-Installations/shared-workflows/.github/workflows/monday-deploy.yml@multi-folder-support
+    uses: Holden-Installations/shared-workflows/.github/workflows/monday-deploy.yml@main
     with:
       app_id: '12415793'
       app_name: 'Site Installation Progress'
